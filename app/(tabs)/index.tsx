@@ -9,7 +9,7 @@ import {
 
 export default function HomeScreen() {
   const memoData = [
-    { id: 1, title: "挨拶", memo: "こんにちは / Hello" },
+    { id: 1, title: "挨拶です", memo: "こんにちは / Hello" },
     { id: 2, title: "Er du hypp på å gjøre no' ulovlig?", memo: "Jeg vil ha deg over meg til morgengry" },
     { id: 3, title: "持ち物", memo: "筆記用具、手帳、予備のバッテリー" },
     { id: 4, title: "英単語: Apple", memo: "リンゴ。赤い果物。" },
