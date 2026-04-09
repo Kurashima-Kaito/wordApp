@@ -1,35 +1,73 @@
 //import { LinearGradient } from 'expo-linear-gradient';  //グラデーション
 import {
   FlatList,
-  Platform, StyleSheet,
+  Platform,
+  Pressable,
+  StyleSheet,
   Text,
   View
 } from 'react-native';
+import { useState } from 'react';
 
+const cardsData = [
+  {
+    name: "英単語English",
+    folders: [
+      {
+        name: "犬1900(青)",
+        folders: [
+          { name: "犬1900, 100~200", folders: [], cards: [] },
+        ],
+        cards: []
+      },
+      { name: "犬1200(黄)", folders: [], cards: [] },
+    ],
+    cards: [
+      {front: "Apple", back: "リンゴ", memo: "赤い果物"},
+      {front: "Perseverance", back: "忍耐、粘り強さ", memo: ""},
+      {front: "Ambiguous", back: "曖昧な、二通りの解釈ができる", memo: ""},
+    ]
+  },
+  {
+    name: "仏単語Français",
+    folders: [],
+    cards: []
+  }
+];
+
+//フォルダーとカードの型定義（仮）
+type Folder = {
+  name: string;
+  folders: Folder[];
+  cards: Card[];
+}
+type Card = {
+  front: string;
+  back: string;
+  memo: string;
+}
+
+const accentColor = "#84e053";
+const lessAccentColor = "#78bd53";
 
 export default function HomeScreen() {
-  const memoData = [
-    { id: 1, title: "挨拶です", memo: "こんにちは / Hello" },
-    { id: 2, title: "Er du hypp på å gjøre no' ulovlig?", memo: "Jeg vil ha deg over meg til morgengry" },
-    { id: 3, title: "持ち物", memo: "筆記用具、手帳、予備のバッテリー" },
-    { id: 4, title: "英単語: Apple", memo: "リンゴ。赤い果物。" },
-    { id: 5, title: "歴史: 鎌倉幕府", memo: "1185年（いい箱作ろう）源頼朝が開く" },
-    { id: 6, title: "技術: React", memo: "UIを構築するためのJavaScriptライブラリ" },
-    { id: 7, title: "献立案", memo: "今夜はカレー。隠し味にチョコを入れる。" },
-    { id: 8, title: "英単語: Perseverance", memo: "忍耐、粘り強さ。フィンランド語のSISUに近い。" },
-    { id: 9, title: "TODO", memo: "ジムに行く。プロテインを買う。" },
-    { id: 10, title: "名言", memo: "失敗は成功のもと。エジソンの言葉。" },
-    { id: 11, title: "理科: 光合成", memo: "植物が光、水、二酸化炭素から酸素を作る仕組み" },
-    { id: 12, title: "パスワードヒント", memo: "実家で最初に飼った犬の名前" },
-    { id: 13, title: "読みたい本", memo: "星の王子さま、サピエンス全史" },
-    { id: 14, title: "数学: 三平方の定理", memo: "a^2 + b^2 = c^2" },
-    { id: 15, title: "旅行計画", memo: "来月は有楽町周辺を散策する" },
-    { id: 16, title: "英単語: Ambiguous", memo: "曖昧な、二通りの解釈ができる" },
-    { id: 17, title: "雑学", memo: "シロクマの肌は実は黒い" },
-    { id: 18, title: "プログラミング", memo: "constは定数、letは再代入可能な変数" },
-    { id: 19, title: "フィンランド語", memo: "Kiitos = ありがとう" },
-    { id: 20, title: "開発メモ", memo: "フラッシュカードの裏返るアニメーションを実装する" }
-  ];
+
+  //今の階層より上のフォルダ名を保存する
+  const [currentFolder, setCurrentFolder] = useState<string[]>([]);
+  //今の階層とその下のフォルダ・ファイル
+  const currentCardsData = findCurrentCardsData(currentFolder);
+  const folderList = createFolderList(currentCardsData);
+  
+  //フォルダをクリックしたときの処理
+  const handleFolderPress = (item: { id: number; name: string}) => {
+    //フォルダ更新
+    setCurrentFolder(prev => [...prev, item.name]);
+  };
+  
+  const handleUndoPress = () => {
+    //フォルダ階層を一つ浅くする
+    setCurrentFolder(prev => prev.slice(0, -1));
+  };
 
   return (
     <>
@@ -38,38 +76,69 @@ export default function HomeScreen() {
       </View>
       <FlatList
         //メモデータをdata propsに指定
-        data={memoData}
+        data={folderList}
         //一意となるkeyをidで管理
         keyExtractor={item => String(item.id)}
         //アイテムを棒で分割する
         ItemSeparatorComponent={() => <View style={{height: 10}}/>}
         //内包コンポーネントの配列
-        contentContainerStyle={styles.cardsContainer}
+        contentContainerStyle={folderStyles.foldersContainer}
         //レンダリングされるViewを定義
         renderItem={({item}) => {
           return (
-            <View style={styles.cardContainer}>
-              <View style={styles.cardTitleContainer}>
+            <Pressable
+              onPress={() => handleFolderPress(item)}
+              style={({hovered, pressed}) => [
+                folderStyles.folderContainer,
+                hovered && folderStyles.folderHover,
+                pressed && folderStyles.folderPressed,
+              ]}
+            >
+              <View style={folderStyles.folderTitleContainer}>
                 <Text
-                  style={styles.cardTitleTextStyle}
+                  style={folderStyles.folderTitleTextStyle}
                   numberOfLines={1}
                   ellipsizeMode="tail">
-                  {item.title}
+                  {item.name}
                 </Text>
               </View>
-              <View style={styles.cardSubTitleContainer}>
-                <Text style={styles.cardSubTitleTextStyle}>{item.memo}</Text>
+              <View style={folderStyles.folderSubTitleContainer}>
+                <Text style={folderStyles.folderSubTitleTextStyle}>a</Text>
               </View>
-              <Text style={styles.cardArrow}>{'＞'}</Text>
-            </View>
+              <Text style={folderStyles.folderArrow}>{'＞'}</Text>
+            </Pressable>
           );
         }}
-      />
+      ></FlatList>
+      <Pressable
+        onPress={() => handleUndoPress()}
+        style={buttonStyles.undoButton}
+      >
+        <Text style={styles.largeTextStyle}>＜</Text>
+      </Pressable>
     </>
   );
 }
 
-//影
+//currentFolderの階層にあるcardsDataを返す
+function findCurrentCardsData(currentFolder: string[]): Folder[] {
+  let currentData = cardsData as Folder[];
+  for (const folderName of currentFolder) {
+    const folder = currentData.find((f): f is Folder => f.name === folderName);
+    if (!folder) return [];
+    currentData = folder.folders;
+  }
+  return currentData;
+}
+
+//cardsDataから一画面に表示するフォルダだけ取り出す
+function createFolderList(data: Folder[]){
+  let folderList = [] as {id: number; name: string}[];
+  data.map((item: Folder, i: number) => {folderList.push({id: i + 1, name: item.name})})
+  return folderList;
+}
+
+//影のstyle
 const shadow = {
   shadowColor: '#000',
   shadowOffset: { width: 0, height: 4 },
@@ -85,43 +154,53 @@ const defaultFont = {
   }),
 }
 
-const styles = StyleSheet.create({
-  cardsContainer: {
+//フォルダ関連のスタイル
+const folderStyles = StyleSheet.create({
+  foldersContainer: {
     paddingTop: 10,
     paddingHorizontal: 20
   },
-  cardContainer: {
+  folderContainer: {
     width: "100%",
     alignSelf: "stretch",
     
     borderRadius: 5,
     height: 80,
     backgroundColor: "white",
+    borderLeftWidth: 6,
+    borderLeftColor: accentColor,
+    overflow: "hidden",
 
     ...shadow,
   },
-  cardTitleContainer: {
+  folderHover: {
+    backgroundColor: "#f7fbff",
+  },
+  folderPressed: {
+    backgroundColor: "#e6f2ff",
+  },
+  folderTitleContainer: {
     marginTop: 10,
     height: 35,
     justifyContent: "center",
     paddingLeft: 10,
     paddingRight: 20,
   },
-  cardSubTitleContainer: {
+  folderSubTitleContainer: {
     height: 30,
     justifyContent: "center",
     paddingHorizontal: 10,
   },
-  cardTitleTextStyle: {
+  folderTitleTextStyle: {
     ...defaultFont,
     fontWeight: "bold",
-    fontSize: 32
+    fontSize: 28
   },
-  cardSubTitleTextStyle: {
+  folderSubTitleTextStyle: {
     ...defaultFont,
     fontSize: 16
   },
-  cardArrow: {
+  folderArrow: {
     position: "absolute",
     right: 8,
     top: 25,
@@ -130,7 +209,25 @@ const styles = StyleSheet.create({
     color: "silver",
     fontSize: 22,
   },
+});
 
+//ボタン関連のスタイル
+const buttonStyles = StyleSheet.create({
+  undoButton: {
+    ...shadow,
+    position: "absolute",
+    left: 10,
+    bottom: 50,
+    textAlignVertical: "center",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: lessAccentColor,
+  },
+});
+
+//テキスト、その他のスタイル
+const styles = StyleSheet.create({
   dividerStyle: {
     borderBottomWidth: 2,
     marginHorizontal: 5,
@@ -151,4 +248,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: 'center'
   }
-});
+})
