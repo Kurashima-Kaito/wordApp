@@ -7,36 +7,15 @@ import {
 } from 'react-native';
 
 export default function testScreen() {
-  useEffect(() => {
-    StatusBar.setHidden(true);
-  }, []);
-
   const renderItem = ({ item }: { item: string }) => {
     return (
-      <View
-        style={{
-          height: 40,
-          justifyContent: 'center',
-          borderTopWidth: 1,
-          borderTopColor: '#EAEAEA',
-        }}
-      >
-        <Text>{item}</Text>
-      </View>
+      <Text>{item}</Text>
     );
   };
 
   const renderSectionHeader = ({ section }: { section: { title: string } }) => {
     return (
-      <View
-        style={{
-          height: 28,
-          backgroundColor: '#F0F0F0',
-          justifyContent: 'center',
-        }}
-      >
-        <Text>{section.title}</Text>
-      </View>
+      <Text>{section.title}</Text>
     );
   };
 

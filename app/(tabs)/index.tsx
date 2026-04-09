@@ -5,7 +5,9 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View
+  View,
+  SectionList,
+  StatusBar,
 } from 'react-native';
 import { useState } from 'react';
 
@@ -55,18 +57,72 @@ export default function HomeScreen() {
   //今の階層より上のフォルダ名を保存する
   const [currentFolder, setCurrentFolder] = useState<string[]>([]);
   //今の階層とその下のフォルダ・ファイル
-  const currentCardsData = findCurrentCardsData(currentFolder);
-  const folderList = createFolderList(currentCardsData);
-  
+  const [foldersData, setFoldersData] = useState<Folder[]>(cardsData);
+  const currentFoldersData = findCurrentFoldersData(currentFolder, foldersData);
+  const folderList = createFolderList(currentFoldersData);
+
+  const cardList = findCurrentCardsData(currentFolder, foldersData);
+  console.log(currentFoldersData, cardList)
+
   //フォルダをクリックしたときの処理
-  const handleFolderPress = (item: { id: number; name: string}) => {
+  const handleFolderPress = (name: string) => {
     //フォルダ更新
-    setCurrentFolder(prev => [...prev, item.name]);
+    setCurrentFolder(prev => [...prev, name]);
   };
   
+  //フォルダ戻るボタン
   const handleUndoPress = () => {
     //フォルダ階層を一つ浅くする
     setCurrentFolder(prev => prev.slice(0, -1));
+  };
+
+  //フォルダ描画
+  const FolderItem = ({ name }: { name: string }) => {
+    return (
+      <>
+        <Pressable
+          onPress={() => handleFolderPress(name)}
+          style={({hovered, pressed}) => [
+            folderStyles.folderContainer,
+            hovered && folderStyles.folderHover,
+            pressed && folderStyles.folderPressed,
+          ]}
+        >
+          <View style={folderStyles.folderTitleContainer}>
+            <Text
+              style={folderStyles.folderTitleTextStyle}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {name}
+            </Text>
+          </View>
+          <View style={folderStyles.folderSubTitleContainer}>
+            <Text style={folderStyles.folderSubTitleTextStyle}>a</Text>
+          </View>
+          <Text style={folderStyles.folderArrow}>{'＞'}</Text>
+        </Pressable>
+        <View style={{height: 10}}/>
+      </>
+    );
+  };
+
+  //カード描画
+  const CardItem = ({ card }: { card: Card }) => {
+    return (
+      <Text style={styles.miniTextStyle}>{card.front}</Text>
+    );
+  };
+
+  //フォルダ描画とカード描画をひとまとめにする
+  const renderItem = ({ item, section }: { item: string | Card; section: { title: string } }) => {
+    const isFolderSection = section.title === 'フォルダ';
+    return isFolderSection ? <FolderItem name={item as string} /> : <CardItem card={item as Card} />;
+  };
+
+  const renderSectionHeader = ({ section }: { section: { title: string } }) => {
+    return (
+      <Text>{section.title}</Text>
+    );
   };
 
   return (
@@ -74,42 +130,26 @@ export default function HomeScreen() {
       <View style={{height: 48, backgroundColor: "gray"}}>
         <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
       </View>
-      <FlatList
-        //メモデータをdata propsに指定
-        data={folderList}
-        //一意となるkeyをidで管理
-        keyExtractor={item => String(item.id)}
-        //アイテムを棒で分割する
-        ItemSeparatorComponent={() => <View style={{height: 10}}/>}
-        //内包コンポーネントの配列
-        contentContainerStyle={folderStyles.foldersContainer}
-        //レンダリングされるViewを定義
-        renderItem={({item}) => {
-          return (
-            <Pressable
-              onPress={() => handleFolderPress(item)}
-              style={({hovered, pressed}) => [
-                folderStyles.folderContainer,
-                hovered && folderStyles.folderHover,
-                pressed && folderStyles.folderPressed,
-              ]}
-            >
-              <View style={folderStyles.folderTitleContainer}>
-                <Text
-                  style={folderStyles.folderTitleTextStyle}
-                  numberOfLines={1}
-                  ellipsizeMode="tail">
-                  {item.name}
-                </Text>
-              </View>
-              <View style={folderStyles.folderSubTitleContainer}>
-                <Text style={folderStyles.folderSubTitleTextStyle}>a</Text>
-              </View>
-              <Text style={folderStyles.folderArrow}>{'＞'}</Text>
-            </Pressable>
-          );
-        }}
-      ></FlatList>
+      
+      <SectionList
+        style={folderStyles.foldersContainer}
+        keyExtractor={(item, index) =>
+          typeof item === 'string' ? item : `${item.front}-${index}`
+        }
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        sections={[
+          {
+            title: 'フォルダ',
+            data: folderList,
+          },
+          {
+            title: 'カード',
+            data: cardList,
+          },
+        ]}
+      />
+      
       <Pressable
         onPress={() => handleUndoPress()}
         style={buttonStyles.undoButton}
@@ -120,9 +160,9 @@ export default function HomeScreen() {
   );
 }
 
-//currentFolderの階層にあるcardsDataを返す
-function findCurrentCardsData(currentFolder: string[]): Folder[] {
-  let currentData = cardsData as Folder[];
+//currentFolderの階層にあるフォルダのデータを返す
+function findCurrentFoldersData(currentFolder: string[], data: Folder[]): Folder[] {
+  let currentData = data;
   for (const folderName of currentFolder) {
     const folder = currentData.find((f): f is Folder => f.name === folderName);
     if (!folder) return [];
@@ -131,10 +171,26 @@ function findCurrentCardsData(currentFolder: string[]): Folder[] {
   return currentData;
 }
 
+//currentFolderの階層にあるカードのデータを返す
+function findCurrentCardsData(currentFolder: string[], data: Folder[]): Card[] {
+  let currentData = data;
+  let index = 0;
+  for (const folderName of currentFolder) {
+    const folder = currentData.find((f): f is Folder => f.name === folderName);
+    if (!folder) return [];
+    if (index === currentFolder.length - 1) return folder.cards;
+    currentData = folder.folders;
+    index++;
+  }
+  return [];
+}
+
 //cardsDataから一画面に表示するフォルダだけ取り出す
-function createFolderList(data: Folder[]){
-  let folderList = [] as {id: number; name: string}[];
-  data.map((item: Folder, i: number) => {folderList.push({id: i + 1, name: item.name})})
+function createFolderList(data: Folder[]): string[] {
+  const folderList: string[] = [];
+  data.forEach((item: Folder) => {
+    folderList.push(item.name);
+  });
   return folderList;
 }
 
@@ -217,7 +273,7 @@ const buttonStyles = StyleSheet.create({
     ...shadow,
     position: "absolute",
     left: 10,
-    bottom: 50,
+    bottom: 20,
     textAlignVertical: "center",
     width: 60,
     height: 60,
