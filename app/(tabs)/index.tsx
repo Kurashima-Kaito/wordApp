@@ -1,63 +1,49 @@
 //import { LinearGradient } from 'expo-linear-gradient';  //グラデーション
+import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
-  FlatList,
-  Platform,
   Pressable,
+  SectionList,
   StyleSheet,
   Text,
-  View,
-  SectionList,
-  StatusBar,
+  View
 } from 'react-native';
-import { useState } from 'react';
+import {
+  Card,
+  createFolderList,
+  defaultFont,
+  findCurrentCardsData,
+  findCurrentFoldersData,
+  Folder,
+  getCardsData,
+} from '../lib/cardsStore';
 
-const cardsData = [
-  {
-    name: "英単語English",
-    folders: [
-      {
-        name: "犬1900(青)",
-        folders: [
-          { name: "犬1900, 100~200", folders: [], cards: [] },
-        ],
-        cards: []
-      },
-      { name: "犬1200(黄)", folders: [], cards: [] },
-    ],
-    cards: [
-      {front: "Apple", back: "リンゴ", memo: "赤い果物"},
-      {front: "Perseverance", back: "忍耐、粘り強さ", memo: ""},
-      {front: "Ambiguous", back: "曖昧な、二通りの解釈ができる", memo: ""},
-    ]
-  },
-  {
-    name: "仏単語Français",
-    folders: [],
-    cards: []
-  }
-];
-
-//フォルダーとカードの型定義（仮）
-type Folder = {
-  name: string;
-  folders: Folder[];
-  cards: Card[];
-}
-type Card = {
-  front: string;
-  back: string;
-  memo: string;
-}
+//読み上げ
+import { Ionicons } from '@expo/vector-icons';
+import * as ExpoSpeech from "expo-speech";
 
 const accentColor = "#84e053";
 const lessAccentColor = "#78bd53";
 
 export default function HomeScreen() {
+  const router = useRouter();
 
   //今の階層より上のフォルダ名を保存する
   const [currentFolder, setCurrentFolder] = useState<string[]>([]);
   //今の階層とその下のフォルダ・ファイル
-  const [foldersData, setFoldersData] = useState<Folder[]>(cardsData);
+  const [foldersData, setFoldersData] = useState<Folder[]>(() =>
+    JSON.parse(JSON.stringify(getCardsData()))
+  );
+  //読み上げ中かどうか
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
+
+  useFocusEffect(
+    useCallback(() => {
+      setFoldersData(JSON.parse(JSON.stringify(getCardsData())));
+    }, [])
+  );
+
   const currentFoldersData = findCurrentFoldersData(currentFolder, foldersData);
   const folderList = createFolderList(currentFoldersData);
 
@@ -70,10 +56,40 @@ export default function HomeScreen() {
     setCurrentFolder(prev => [...prev, name]);
   };
   
+  //カードをクリックしたときの処理
+  const handleCardPress = (cardIndex: number) => {
+    router.push(
+      `/edit?folderPath=${encodeURIComponent(JSON.stringify(currentFolder))}&cardIndex=${cardIndex}`
+    );
+  };
+  
   //フォルダ戻るボタン
   const handleUndoPress = () => {
     //フォルダ階層を一つ浅くする
     setCurrentFolder(prev => prev.slice(0, -1));
+  };
+
+  //読み上げボタン
+  const handleSpeech = (text: string) => {
+      // 再生中の場合は、音声を停止する。
+      if (isSpeaking) {
+          ExpoSpeech.stop()
+          setIsSpeaking(false)
+          return
+      }
+
+      setIsSpeaking(true)
+
+      // expo-speechのパラメータ設定
+      const options = {
+          language: 'fi',
+          pitch: 1.0,  // 音声のピッチ
+          rate: 1.0,  // 音声速度
+          onDone: () => setIsSpeaking(false),  // 再生完了時の処理
+          onError: () => setIsSpeaking(false) // 再生中にエラーが発生した時の処理
+      }
+      // テキストの内容を音声読み上げ
+      ExpoSpeech.speak(text, options)
   };
 
   //フォルダ描画
@@ -107,16 +123,45 @@ export default function HomeScreen() {
   };
 
   //カード描画
-  const CardItem = ({ card }: { card: Card }) => {
+  const CardItem = ({ card, cardIndex }: { card: Card; cardIndex: number }) => {
     return (
-      <Text style={styles.miniTextStyle}>{card.front}</Text>
+      <>
+        <Pressable
+          onPress={() => handleCardPress(cardIndex)}
+          style={({hovered, pressed}) => [
+            cardStyles.cardContainer,
+            hovered && cardStyles.cardHover,
+            pressed && cardStyles.cardPressed,
+          ]}
+        >
+          <View style={cardStyles.cardTitleContainer}>
+            <Ionicons name="volume-high" size={20} color="grey" onPress={() => handleSpeech(card.front)} />
+            <View style={{width: 5}}/>
+            <Text style={cardStyles.cardTitleTextStyle}>
+              {card.front}
+            </Text>
+            <Text style={cardStyles.cardIndexTextStyle}>{cardIndex}</Text>
+          </View>
+          <View style={cardStyles.cardSubTitleContainer}>
+            <Text style={cardStyles.cardSubTitleTextStyle}>{card.back}</Text>
+          </View>
+        </Pressable>
+        {card.memo != "" && (
+          <View style={cardStyles.cardMemoContainer}>
+            <Text>{card.memo}</Text>
+          </View>
+        )}
+        <View style={{height: 10}}/>
+      </>
     );
   };
 
   //フォルダ描画とカード描画をひとまとめにする
-  const renderItem = ({ item, section }: { item: string | Card; section: { title: string } }) => {
+  const renderItem = ({ item, index, section }: { item: string | Card; index: number; section: { title: string } }) => {
     const isFolderSection = section.title === 'フォルダ';
-    return isFolderSection ? <FolderItem name={item as string} /> : <CardItem card={item as Card} />;
+    return isFolderSection
+      ? <FolderItem name={item as string} />
+      : <CardItem card={item as Card} cardIndex={index} />;
   };
 
   const renderSectionHeader = ({ section }: { section: { title: string } }) => {
@@ -160,40 +205,6 @@ export default function HomeScreen() {
   );
 }
 
-//currentFolderの階層にあるフォルダのデータを返す
-function findCurrentFoldersData(currentFolder: string[], data: Folder[]): Folder[] {
-  let currentData = data;
-  for (const folderName of currentFolder) {
-    const folder = currentData.find((f): f is Folder => f.name === folderName);
-    if (!folder) return [];
-    currentData = folder.folders;
-  }
-  return currentData;
-}
-
-//currentFolderの階層にあるカードのデータを返す
-function findCurrentCardsData(currentFolder: string[], data: Folder[]): Card[] {
-  let currentData = data;
-  let index = 0;
-  for (const folderName of currentFolder) {
-    const folder = currentData.find((f): f is Folder => f.name === folderName);
-    if (!folder) return [];
-    if (index === currentFolder.length - 1) return folder.cards;
-    currentData = folder.folders;
-    index++;
-  }
-  return [];
-}
-
-//cardsDataから一画面に表示するフォルダだけ取り出す
-function createFolderList(data: Folder[]): string[] {
-  const folderList: string[] = [];
-  data.forEach((item: Folder) => {
-    folderList.push(item.name);
-  });
-  return folderList;
-}
-
 //影のstyle
 const shadow = {
   shadowColor: '#000',
@@ -202,13 +213,6 @@ const shadow = {
   shadowRadius: 6,
   elevation: 3,
 };
-const defaultFont = {
-  fontFamily: Platform.select({
-    ios: 'Times New Roman, Hiragino Sans', 
-    android: 'Times New Roman, sans-serif',
-    default: 'Bahnschrift, Hiragino Sans'
-  }),
-}
 
 //フォルダ関連のスタイル
 const folderStyles = StyleSheet.create({
@@ -264,6 +268,75 @@ const folderStyles = StyleSheet.create({
     textAlignVertical: "center",
     color: "silver",
     fontSize: 22,
+  },
+});
+
+//カード関連のスタイル
+const cardStyles = StyleSheet.create({
+  cardsContainer: {
+    paddingTop: 10,
+    paddingHorizontal: 20
+  },
+  cardContainer: {
+    width: "100%",
+    alignSelf: "stretch",
+    
+    borderRadius: 5,
+    minHeight: 80,
+    backgroundColor: "white",
+    borderTopWidth: 6,
+    borderTopColor: accentColor,
+    overflow: "hidden",
+    zIndex: 2,
+
+    ...shadow,
+  },
+  cardMemoContainer: {
+    width: "90%",
+    alignSelf: "center",
+    
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+    padding: 5,
+
+    backgroundColor: "#e4d7b8",
+    zIndex: 1,
+    ...shadow,
+  },
+  cardHover: {
+    backgroundColor: "#f7fbff",
+  },
+  cardPressed: {
+    backgroundColor: "#e6f2ff",
+  },
+  cardTitleContainer: {
+    marginTop: 0,
+    minHeight: 35,
+    justifyContent: "center",
+    paddingLeft: 10,
+    paddingRight: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardSubTitleContainer: {
+    height: 30,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+  cardTitleTextStyle: {
+    ...defaultFont,
+    fontWeight: "bold",
+    fontSize: 28
+  },
+  cardSubTitleTextStyle: {
+    ...defaultFont,
+    fontSize: 16
+  },
+  cardIndexTextStyle: {
+    ...defaultFont,
+    fontSize: 14,
+    color: "#999",
+    marginLeft: "auto",
   },
 });
 
