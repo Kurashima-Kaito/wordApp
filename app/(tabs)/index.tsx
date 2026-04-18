@@ -18,16 +18,18 @@ import {
   Folder,
   getCardsData,
 } from '../lib/cardsStore';
+import { useColors } from '../lib/colors';
+import { useTheme } from '../lib/themeContext';
 
 //読み上げ
 import { Ionicons } from '@expo/vector-icons';
 import * as ExpoSpeech from "expo-speech";
-
-const accentColor = "#84e053";
-const lessAccentColor = "#78bd53";
+import { franc } from 'franc';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const colors = useColors();
+  const { theme } = useTheme();
 
   //今の階層より上のフォルダ名を保存する
   const [currentFolder, setCurrentFolder] = useState<string[]>([]);
@@ -80,9 +82,15 @@ export default function HomeScreen() {
 
       setIsSpeaking(true)
 
+      const detectedLang = franc(text);
+      let language = 'en'; // デフォルト
+      if (detectedLang !== 'und') {
+        language = detectedLang.slice(0, 2); // ISO 639-1形式に変換
+      }
+
       // expo-speechのパラメータ設定
       const options = {
-          language: 'fi',
+          language: language,
           pitch: 1.0,  // 音声のピッチ
           rate: 1.0,  // 音声速度
           onDone: () => setIsSpeaking(false),  // 再生完了時の処理
@@ -148,7 +156,9 @@ export default function HomeScreen() {
         </Pressable>
         {card.memo != "" && (
           <View style={cardStyles.cardMemoContainer}>
-            <Text>{card.memo}</Text>
+            <Text style={cardStyles.cardMemoTextStyle}>
+              {card.memo}
+            </Text>
           </View>
         )}
         <View style={{height: 10}}/>
@@ -165,15 +175,206 @@ export default function HomeScreen() {
   };
 
   const renderSectionHeader = ({ section }: { section: { title: string } }) => {
-    return (
-      <Text>{section.title}</Text>
-    );
+    return section.title === 'カード' ? <View style={styles.dividerStyle}/> : <></>;
   };
+
+  //影のstyle
+  const shadow = {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: theme === 'dark' ? 0.5 : 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  };
+
+  //フォルダ関連のスタイル
+  const folderStyles = StyleSheet.create({
+    foldersContainer: {
+      paddingTop: 10,
+      paddingHorizontal: 20,
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+    folderContainer: {
+      width: "100%",
+      alignSelf: "stretch",
+      
+      borderRadius: 5,
+      height: 80,
+      backgroundColor: colors.element,
+      borderLeftWidth: 6,
+      borderLeftColor: colors.accentColor,
+      overflow: "hidden",
+
+      ...shadow,
+    },
+    folderHover: {
+      backgroundColor: colors.elementHover,
+    },
+    folderPressed: {
+      backgroundColor: colors.elementClicked,
+    },
+    folderTitleContainer: {
+      marginTop: 10,
+      height: 35,
+      justifyContent: "center",
+      paddingLeft: 10,
+      paddingRight: 20,
+    },
+    folderSubTitleContainer: {
+      height: 30,
+      justifyContent: "center",
+      paddingHorizontal: 10,
+    },
+    folderTitleTextStyle: {
+      ...defaultFont,
+      fontWeight: "bold",
+      fontSize: 28,
+      color: colors.titleText,
+    },
+    folderSubTitleTextStyle: {
+      ...defaultFont,
+      fontSize: 16,
+      color: colors.plainText,
+    },
+    folderArrow: {
+      position: "absolute",
+      right: 8,
+      top: 25,
+      bottom: 0,
+      textAlignVertical: "center",
+      color: colors.plainText,
+      fontSize: 22,
+    },
+  });
+
+  //カード関連のスタイル
+  const cardStyles = StyleSheet.create({
+    cardsContainer: {
+      paddingTop: 10,
+      paddingHorizontal: 20
+    },
+    cardContainer: {
+      width: "100%",
+      alignSelf: "stretch",
+      
+      borderRadius: 5,
+      minHeight: 80,
+      backgroundColor: colors.element,
+      borderTopWidth: 6,
+      borderTopColor: colors.accentColor,
+      overflow: "hidden",
+      zIndex: 2,
+
+      ...shadow,
+    },
+    cardMemoContainer: {
+      width: "90%",
+      alignSelf: "center",
+      
+      borderBottomLeftRadius: 5,
+      borderBottomRightRadius: 5,
+      padding: 5,
+
+      backgroundColor: colors.memo,
+      zIndex: 1,
+      ...shadow,
+    },
+    cardHover: {
+      backgroundColor: colors.elementHover,
+    },
+    cardPressed: {
+      backgroundColor: colors.elementClicked,
+    },
+    cardTitleContainer: {
+      marginTop: 0,
+      minHeight: 35,
+      justifyContent: "center",
+      paddingLeft: 10,
+      paddingRight: 20,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    cardSubTitleContainer: {
+      height: 30,
+      justifyContent: "center",
+      paddingHorizontal: 10,
+    },
+    cardTitleTextStyle: {
+      ...defaultFont,
+      fontWeight: "bold",
+      fontSize: 28,
+      color: colors.titleText,
+    },
+    cardSubTitleTextStyle: {
+      ...defaultFont,
+      fontSize: 16,
+      color: colors.plainText,
+    },
+    cardIndexTextStyle: {
+      ...defaultFont,
+      fontSize: 14,
+      color: colors.plainText,
+      marginLeft: "auto",
+    },
+    cardMemoTextStyle: {
+      ...defaultFont,
+      fontSize: 14,
+      color: colors.titleText,
+    },
+  });
+
+  //ボタン関連のスタイル
+  const buttonStyles = StyleSheet.create({
+    undoButton: {
+      ...shadow,
+      position: "absolute",
+      left: 10,
+      bottom: 20,
+      textAlignVertical: "center",
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colors.lessAccentColor,
+    },
+  });
+
+  //テキスト、その他のスタイル
+  const styles = StyleSheet.create({
+    dividerStyle: {
+      borderBottomWidth: 2,
+      marginHorizontal: 5,
+      borderColor: colors.element,
+      marginBottom: 10,
+    },
+
+    miniTextStyle: {
+      fontSize: 16,
+      color: colors.plainText,
+    },
+    accentTextStyle: {
+      fontSize: 32,
+      color: colors.accentColor,
+    },
+    largeTextStyle: {
+      ...defaultFont,
+      fontSize: 32,
+      color: "white",
+      textAlign: "center",
+      justifyContent: 'center'
+    }
+  });
 
   return (
     <>
-      <View style={{height: 48, backgroundColor: "gray"}}>
+      <View style={{height: 48, backgroundColor: "black"}}>
         <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
+      </View>
+
+      <View style={{height: 48, backgroundColor: colors.element, alignItems: "center", justifyContent: "center", ...shadow}}>
+        <Pressable onPress={() => router.push('/settings')}>
+          <View style={{width: 30, height: 30, backgroundColor: colors.accentColor}}></View>
+        </Pressable>
       </View>
       
       <SectionList
@@ -204,177 +405,3 @@ export default function HomeScreen() {
     </>
   );
 }
-
-//影のstyle
-const shadow = {
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.1,
-  shadowRadius: 6,
-  elevation: 3,
-};
-
-//フォルダ関連のスタイル
-const folderStyles = StyleSheet.create({
-  foldersContainer: {
-    paddingTop: 10,
-    paddingHorizontal: 20
-  },
-  folderContainer: {
-    width: "100%",
-    alignSelf: "stretch",
-    
-    borderRadius: 5,
-    height: 80,
-    backgroundColor: "white",
-    borderLeftWidth: 6,
-    borderLeftColor: accentColor,
-    overflow: "hidden",
-
-    ...shadow,
-  },
-  folderHover: {
-    backgroundColor: "#f7fbff",
-  },
-  folderPressed: {
-    backgroundColor: "#e6f2ff",
-  },
-  folderTitleContainer: {
-    marginTop: 10,
-    height: 35,
-    justifyContent: "center",
-    paddingLeft: 10,
-    paddingRight: 20,
-  },
-  folderSubTitleContainer: {
-    height: 30,
-    justifyContent: "center",
-    paddingHorizontal: 10,
-  },
-  folderTitleTextStyle: {
-    ...defaultFont,
-    fontWeight: "bold",
-    fontSize: 28
-  },
-  folderSubTitleTextStyle: {
-    ...defaultFont,
-    fontSize: 16
-  },
-  folderArrow: {
-    position: "absolute",
-    right: 8,
-    top: 25,
-    bottom: 0,
-    textAlignVertical: "center",
-    color: "silver",
-    fontSize: 22,
-  },
-});
-
-//カード関連のスタイル
-const cardStyles = StyleSheet.create({
-  cardsContainer: {
-    paddingTop: 10,
-    paddingHorizontal: 20
-  },
-  cardContainer: {
-    width: "100%",
-    alignSelf: "stretch",
-    
-    borderRadius: 5,
-    minHeight: 80,
-    backgroundColor: "white",
-    borderTopWidth: 6,
-    borderTopColor: accentColor,
-    overflow: "hidden",
-    zIndex: 2,
-
-    ...shadow,
-  },
-  cardMemoContainer: {
-    width: "90%",
-    alignSelf: "center",
-    
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
-    padding: 5,
-
-    backgroundColor: "#e4d7b8",
-    zIndex: 1,
-    ...shadow,
-  },
-  cardHover: {
-    backgroundColor: "#f7fbff",
-  },
-  cardPressed: {
-    backgroundColor: "#e6f2ff",
-  },
-  cardTitleContainer: {
-    marginTop: 0,
-    minHeight: 35,
-    justifyContent: "center",
-    paddingLeft: 10,
-    paddingRight: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  cardSubTitleContainer: {
-    height: 30,
-    justifyContent: "center",
-    paddingHorizontal: 10,
-  },
-  cardTitleTextStyle: {
-    ...defaultFont,
-    fontWeight: "bold",
-    fontSize: 28
-  },
-  cardSubTitleTextStyle: {
-    ...defaultFont,
-    fontSize: 16
-  },
-  cardIndexTextStyle: {
-    ...defaultFont,
-    fontSize: 14,
-    color: "#999",
-    marginLeft: "auto",
-  },
-});
-
-//ボタン関連のスタイル
-const buttonStyles = StyleSheet.create({
-  undoButton: {
-    ...shadow,
-    position: "absolute",
-    left: 10,
-    bottom: 20,
-    textAlignVertical: "center",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: lessAccentColor,
-  },
-});
-
-//テキスト、その他のスタイル
-const styles = StyleSheet.create({
-  dividerStyle: {
-    borderBottomWidth: 2,
-    marginHorizontal: 5,
-    borderColor: "silver"
-  },
-
-  miniTextStyle: {
-    fontSize: 16
-  },
-  accentTextStyle: {
-    fontSize: 32,
-    color: "red"
-  },
-  largeTextStyle: {
-    ...defaultFont,
-    fontSize: 32,
-    color: "white",
-    textAlign: "center",
-    justifyContent: 'center'
-  }
-})

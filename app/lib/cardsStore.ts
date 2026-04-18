@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { colors } from './colors';
 
 export const defaultFont = {
   fontFamily: Platform.select({
@@ -6,6 +7,7 @@ export const defaultFont = {
     android: 'Times New Roman, sans-serif',
     default: 'Bahnschrift, Hiragino Sans'
   }),
+  color: colors.titleText,
 };
 
 export type Card = {
