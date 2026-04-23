@@ -1,7 +1,9 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { getCard, updateCard, defaultFont } from './lib/cardsStore';
+import { JSX, useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { getCard, updateCard } from './lib/cardsStore';
+import { getDefaultFontFamily, useColors, shadow } from './lib/colors';
+import { useFontSettings } from './lib/fontContext';
 
 type CardData = {
   front: string;
@@ -16,6 +18,8 @@ export default function EditCardScreen() {
   const [back, setBack] = useState('');
   const [memo, setMemo] = useState('');
   const [isValidCard, setIsValidCard] = useState(true);
+  const { settings } = useFontSettings();
+  const colors = useColors();
 
   useEffect(() => {
     const folderPath = params.folderPath ? JSON.parse(params.folderPath as string) as string[] : [];
@@ -46,6 +50,72 @@ export default function EditCardScreen() {
     router.back();
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: colors.background,
+    },
+    field: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 10,
+      margin: 2,
+      color: colors.titleText,
+      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
+    },
+    input: {
+      backgroundColor: 'white',
+      borderColor: colors.plainText,
+      borderRadius: 5,
+      padding: 3,
+      fontSize: 20,
+      minHeight: 40,
+      
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
+      
+      ...shadow
+    },
+    memoInput: {
+      minHeight: 100,
+      textAlignVertical: 'top',
+      
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont)
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 20,
+    },
+    button: {
+      backgroundColor: '#84e053',
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+    },
+    cancelButton: {
+      backgroundColor: '#999',
+    },
+    buttonText: {
+      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
+      color: 'white',
+      fontSize: 16,
+    },
+    errorText: {
+      fontSize: 16,
+      color: '#900',
+      marginBottom: 20,
+    },
+    largeTextStyle: {
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
+      fontSize: 32,
+      color: "white",
+      textAlign: "center",
+      justifyContent: 'center'
+    }
+  });
+
   if (!isValidCard) {
     return (
       <View style={styles.container}>
@@ -61,36 +131,36 @@ export default function EditCardScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={{height: 48, backgroundColor: "gray"}}>
+      <View style={{height: 48, backgroundColor: "black"}}>
         <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
       </View>
+
       <View style={styles.container}>
       <View style={styles.field}>
-        <Text style={styles.label}>Front</Text>
+        <Text style={styles.label}>表面</Text>
         <TextInput
           style={styles.input}
           value={front}
-          multiline={true}
+          multiline
           onChangeText={setFront}
           placeholder="英単語"
         />
       </View>
       <View style={styles.field}>
-        <Text style={styles.label}>Back</Text>
+        <Text style={styles.label}>裏面</Text>
         <TextInput
           style={styles.input}
           value={back}
+          multiline
           onChangeText={setBack}
-          placeholder="意味"
         />
       </View>
       <View style={styles.field}>
-        <Text style={styles.label}>Memo</Text>
+        <Text style={styles.label}>メモ</Text>
         <TextInput
-          style={[styles.input, styles.memoInput]}
+          style={styles.input}
           value={memo}
           onChangeText={setMemo}
-          placeholder="メモ"
           multiline
         />
       </View>
@@ -106,62 +176,3 @@ export default function EditCardScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f7f7f7',
-  },
-  field: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: 'white',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 12,
-    
-    ...defaultFont
-  },
-  memoInput: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#84e053',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  cancelButton: {
-    backgroundColor: '#999',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#900',
-    marginBottom: 20,
-  },
-  largeTextStyle: {
-    ...defaultFont,
-    fontSize: 32,
-    color: "white",
-    textAlign: "center",
-    justifyContent: 'center'
-  }
-});

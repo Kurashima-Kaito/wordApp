@@ -12,13 +12,13 @@ import {
 import {
   Card,
   createFolderList,
-  defaultFont,
   findCurrentCardsData,
   findCurrentFoldersData,
   Folder,
   getCardsData,
 } from '../lib/cardsStore';
-import { useColors } from '../lib/colors';
+import { getDefaultFontFamily, shadow, useColors } from '../lib/colors';
+import { useFontSettings } from '../lib/fontContext';
 import { useTheme } from '../lib/themeContext';
 
 //読み上げ
@@ -29,6 +29,7 @@ import { franc } from 'franc';
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
+  const { settings } = useFontSettings();
   const { theme } = useTheme();
 
   //今の階層より上のフォルダ名を保存する
@@ -178,15 +179,6 @@ export default function HomeScreen() {
     return section.title === 'カード' ? <View style={styles.dividerStyle}/> : <></>;
   };
 
-  //影のstyle
-  const shadow = {
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: theme === 'dark' ? 0.5 : 0.2,
-    shadowRadius: 6,
-    elevation: 3,
-  };
-
   //フォルダ関連のスタイル
   const folderStyles = StyleSheet.create({
     foldersContainer: {
@@ -227,13 +219,12 @@ export default function HomeScreen() {
       paddingHorizontal: 10,
     },
     folderTitleTextStyle: {
-      ...defaultFont,
-      fontWeight: "bold",
+      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
       fontSize: 28,
       color: colors.titleText,
     },
     folderSubTitleTextStyle: {
-      ...defaultFont,
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 16,
       color: colors.plainText,
     },
@@ -296,29 +287,27 @@ export default function HomeScreen() {
       alignItems: "center",
     },
     cardSubTitleContainer: {
-      height: 30,
       justifyContent: "center",
       paddingHorizontal: 10,
     },
     cardTitleTextStyle: {
-      ...defaultFont,
-      fontWeight: "bold",
+      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
       fontSize: 28,
       color: colors.titleText,
     },
     cardSubTitleTextStyle: {
-      ...defaultFont,
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 16,
       color: colors.plainText,
     },
     cardIndexTextStyle: {
-      ...defaultFont,
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 14,
       color: colors.plainText,
       marginLeft: "auto",
     },
     cardMemoTextStyle: {
-      ...defaultFont,
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 14,
       color: colors.titleText,
     },
@@ -357,7 +346,7 @@ export default function HomeScreen() {
       color: colors.accentColor,
     },
     largeTextStyle: {
-      ...defaultFont,
+      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 32,
       color: "white",
       textAlign: "center",

@@ -1,15 +1,3 @@
-import { Platform } from 'react-native';
-import { colors } from './colors';
-
-export const defaultFont = {
-  fontFamily: Platform.select({
-    ios: 'Times New Roman, Hiragino Sans',
-    android: 'Times New Roman, sans-serif',
-    default: 'Bahnschrift, Hiragino Sans'
-  }),
-  color: colors.titleText,
-};
-
 export type Card = {
   front: string;
   back: string;
@@ -40,7 +28,8 @@ const initialCardsData: Folder[] = [
     cards: [
       { front: "Bráðum", back: "もうすぐ", memo: "アイスランド語単語 1900" },
       { front: "Lohikeittö", back: "サーモンスープ", memo: "フィンランド語単語 1900" },
-      { front: "Ambiguous", back: "曖昧な、二通りの解釈ができる", memo: "" },
+      { front: "Ambiguous", back: "曖昧な\n二通りの解釈が\nでき\nる", memo: "" },
+      { front: "ᐃᖅᑲᓇᐃᔭᖅとქართულიとεγόとДавайとՍպանախとབོད་ཀེད།と사람とမြန်မာ", back: "仕事とジョージアと私としようとほうれん草とチベット語と人とミャンマー", memo: "" },
     ]
   },
   {
@@ -52,7 +41,7 @@ const initialCardsData: Folder[] = [
     ]
   },
   {
-    name: "長いやつ",
+    name: "長いやつWindows",
     folders: [],
     cards: [
         { front: "[Pre-Chorus]\nEr du hypp på å gjøre no\' ulovlig?\nJeg vil ha deg over meg til morgengry\nDama ville rulle i Ferrari\nSå nå ruller hun med meg\n\n[Verse 1]\nSå mange damer her, men tiden går så fort\nAlle her i byen vet hva jeg har gjort (Har gjort)\nHun liker fuckboys ha\'kke noe i mot\nAt alle her i byen vet hva jeg har gjort\nO-oh, baby jeg lover deg, i natt, i natt\nSå oh, ligger du over meg, meg, meg\n\n[Pre-Chorus]\nOg hun sa \"er du hypp på å gjøre no\' ulovlig?\"\nJeg vil ha deg over meg til morgengry\nDama ville rulle i Ferrari\nSå nå ruller hun med meg\n\n[Chorus]\nDama sa hei, jeg snudde min vei\nOg jeg har vært på deg og deg og deg og deg og deg\nJeg husker du sa da jeg måtte dra\nNå er det bare deg og meg og meg og meg og meg\n\n[Pre-Chorus]\n\n[Pre-Chorus]\n\n[Verse 2]\nSå mye penger her, men tiden går så fort\nAlle her i byen vet hva jeg har gjort (Har gjort)\nHun liker fuckboys ha\'kke noe i mot\nAt alle her i byen vet hva jeg har gjort\nO-oh, baby jeg lover deg, i natt, i natt\nSå oh, ligger du over meg, meg, meg\n\n[Pre-Chorus]\n\n[Chorus]", back: "ulovlig", memo: "" }
