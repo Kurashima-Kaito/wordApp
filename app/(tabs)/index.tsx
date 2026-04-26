@@ -17,8 +17,7 @@ import {
   Folder,
   getCardsData,
 } from '../lib/cardsStore';
-import { getDefaultFontFamily, shadow, useColors } from '../lib/colors';
-import { useFontSettings } from '../lib/fontContext';
+import { boldWeight, shadow, useColors } from '../lib/colors';
 import { useTheme } from '../lib/themeContext';
 
 //読み上げ
@@ -29,7 +28,6 @@ import { franc } from 'franc';
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
-  const { settings } = useFontSettings();
   const { theme } = useTheme();
 
   //今の階層より上のフォルダ名を保存する
@@ -196,7 +194,6 @@ export default function HomeScreen() {
       backgroundColor: colors.element,
       borderLeftWidth: 6,
       borderLeftColor: colors.accentColor,
-      overflow: "hidden",
 
       ...shadow,
     },
@@ -219,12 +216,11 @@ export default function HomeScreen() {
       paddingHorizontal: 10,
     },
     folderTitleTextStyle: {
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
+      fontWeight: boldWeight,
       fontSize: 28,
       color: colors.titleText,
     },
     folderSubTitleTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 16,
       color: colors.plainText,
     },
@@ -233,7 +229,7 @@ export default function HomeScreen() {
       right: 8,
       top: 25,
       bottom: 0,
-      textAlignVertical: "center",
+      textAlignVertical: "center" as const,
       color: colors.plainText,
       fontSize: 22,
     },
@@ -246,6 +242,7 @@ export default function HomeScreen() {
       paddingHorizontal: 20
     },
     cardContainer: {
+      ...shadow,
       width: "100%",
       alignSelf: "stretch",
       
@@ -254,12 +251,10 @@ export default function HomeScreen() {
       backgroundColor: colors.element,
       borderTopWidth: 6,
       borderTopColor: colors.accentColor,
-      overflow: "hidden",
       zIndex: 2,
-
-      ...shadow,
     },
     cardMemoContainer: {
+      ...shadow,
       width: "90%",
       alignSelf: "center",
       
@@ -269,7 +264,6 @@ export default function HomeScreen() {
 
       backgroundColor: colors.memo,
       zIndex: 1,
-      ...shadow,
     },
     cardHover: {
       backgroundColor: colors.elementHover,
@@ -291,23 +285,20 @@ export default function HomeScreen() {
       paddingHorizontal: 10,
     },
     cardTitleTextStyle: {
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
+      fontWeight: boldWeight,
       fontSize: 28,
       color: colors.titleText,
     },
     cardSubTitleTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 16,
       color: colors.plainText,
     },
     cardIndexTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 14,
       color: colors.plainText,
       marginLeft: "auto",
     },
     cardMemoTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 14,
       color: colors.titleText,
     },
@@ -320,7 +311,7 @@ export default function HomeScreen() {
       position: "absolute",
       left: 10,
       bottom: 20,
-      textAlignVertical: "center",
+      textAlignVertical: "center" as const,
       width: 60,
       height: 60,
       borderRadius: 30,
@@ -346,11 +337,9 @@ export default function HomeScreen() {
       color: colors.accentColor,
     },
     largeTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
       fontSize: 32,
       color: "white",
       textAlign: "center",
-      justifyContent: 'center'
     }
   });
 

@@ -1,9 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { JSX, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getCard, updateCard } from './lib/cardsStore';
-import { getDefaultFontFamily, useColors, shadow } from './lib/colors';
-import { useFontSettings } from './lib/fontContext';
+import { boldWeight, shadow, useColors } from './lib/colors';
 
 type CardData = {
   front: string;
@@ -18,7 +17,6 @@ export default function EditCardScreen() {
   const [back, setBack] = useState('');
   const [memo, setMemo] = useState('');
   const [isValidCard, setIsValidCard] = useState(true);
-  const { settings } = useFontSettings();
   const colors = useColors();
 
   useEffect(() => {
@@ -51,19 +49,11 @@ export default function EditCardScreen() {
   };
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: colors.background,
-    },
-    field: {
-      marginBottom: 16,
-    },
     label: {
       fontSize: 10,
       margin: 2,
       color: colors.titleText,
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
+      fontWeight: boldWeight
     },
     input: {
       backgroundColor: 'white',
@@ -72,16 +62,29 @@ export default function EditCardScreen() {
       padding: 3,
       fontSize: 20,
       minHeight: 40,
-      
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
-      
       ...shadow
     },
     memoInput: {
       minHeight: 100,
       textAlignVertical: 'top',
-      
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont)
+    },
+    buttonText: {
+      fontWeight: boldWeight,
+      color: 'white',
+      fontSize: 16,
+    },
+    largeTextStyle: {
+      fontSize: 32,
+      color: "white",
+      textAlign: "center",
+    },
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: colors.background,
+    },
+    field: {
+      marginBottom: 16,
     },
     buttonRow: {
       flexDirection: 'row',
@@ -97,23 +100,11 @@ export default function EditCardScreen() {
     cancelButton: {
       backgroundColor: '#999',
     },
-    buttonText: {
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
-      color: 'white',
-      fontSize: 16,
-    },
     errorText: {
       fontSize: 16,
       color: '#900',
       marginBottom: 20,
     },
-    largeTextStyle: {
-      fontFamily: getDefaultFontFamily(undefined, settings.englishFont, settings.japaneseFont),
-      fontSize: 32,
-      color: "white",
-      textAlign: "center",
-      justifyContent: 'center'
-    }
   });
 
   if (!isValidCard) {

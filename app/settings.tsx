@@ -1,18 +1,31 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
-import { getDefaultFontFamily, shadow, useColors } from './lib/colors';
-import { useFontSettings } from './lib/fontContext';
+import { boldWeight, shadow, useColors } from './lib/colors';
 import { useTheme } from './lib/themeContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const colors = useColors();
-  const { settings, setJapaneseFont, setEnglishFont } = useFontSettings();
 
   const styles = StyleSheet.create({
+    title: {
+      fontWeight: boldWeight,
+      fontSize: 24,
+      marginBottom: 20,
+    },
+    label: {
+      fontWeight: boldWeight,
+      fontSize: 18,
+      color: colors.titleText,
+    },
+    largeTextStyle: {
+      fontWeight: boldWeight,
+      fontSize: 32,
+      color: "white",
+      textAlign: "center",
+    },
     settingsContainer: {
       flex: 1,
       padding: 20,
@@ -32,40 +45,23 @@ export default function SettingsScreen() {
 
       ...shadow,
     },
-    title: {
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
-      fontSize: 24,
-      marginBottom: 20,
-    },
-    label: {
-      fontFamily: getDefaultFontFamily('bold', settings.englishFont, settings.japaneseFont),
-      fontSize: 18,
-      color: colors.titleText,
-    },
     pickerContainer: {
       marginLeft: 10,
       borderRadius: 5,
-      backgroundColor: colors.element,
+      backgroundColor: 'transparent',
+      width: '50%',
     },
     picker: {
       color: colors.titleText,
+      paddingVertical: 10,
+      paddingHorizontal: 10,
     },
-    largeTextStyle: {
-      fontFamily: getDefaultFontFamily('normal', settings.englishFont, settings.japaneseFont),
-      fontSize: 32,
-      color: "white",
-      textAlign: "center",
-      justifyContent: 'center'
-    }
   });
 
   return (<>
-      <View style={{height: 48, backgroundColor: "black"}}>
-        <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
-      </View>
       <View style={{height: 48, backgroundColor: colors.element, alignItems: "center", justifyContent: "center"}}>
         <Pressable onPress={() => router.push('/')}>
-          <View style={{width: 30, height: 30, backgroundColor: colors.accentColor}}></View>
+          <Text style={styles.label}>設定</Text>
         </Pressable>
       </View>
       <View style={styles.settingsContainer}>
@@ -81,36 +77,14 @@ export default function SettingsScreen() {
         <View style={styles.settingContainer}>
           <Text style={styles.label}>日本語フォント</Text>
           <View style={styles.pickerContainer}>
-            <RNPickerSelect
-              items={[
-                { label: 'Gothic', value: 'Gothic' },
-                { label: 'Mincho', value: 'Mincho' },
-              ]}
-              onValueChange={setJapaneseFont}
-              value={settings.japaneseFont}
-              style={{
-                inputIOS: styles.picker,
-                inputAndroid: styles.picker,
-              }}
-            />
+            
           </View>
         </View>
         
         <View style={styles.settingContainer}>
           <Text style={styles.label}>英数字フォント</Text>
           <View style={styles.pickerContainer}>
-            <RNPickerSelect
-              items={[
-                { label: 'GentiumBookPlus', value: 'GentiumBookPlus' },
-                { label: 'NotoSans', value: 'NotoSans' },
-              ]}
-              onValueChange={setEnglishFont}
-              value={settings.englishFont}
-              style={{
-                inputIOS: styles.picker,
-                inputAndroid: styles.picker,
-              }}
-            />
+            
           </View>
         </View>
 

@@ -41,14 +41,7 @@
       ]
     ],
     "assets": [
-      "./fonts/BIZUDPGothic-Regular.ttf",
-      "./fonts/BIZUDPGothic-Bold.ttf",
-      "./fonts/BIZUDPMincho-Regular.ttf",
-      "./fonts/BIZUDPMincho-Bold.ttf",
-      "./fonts/GentiumBookPlus-Regular.ttf",
-      "./fonts/GentiumBookPlus-Bold.ttf",
-      "./fonts/NotoSans-Regular.ttf",
-      "./fonts/NotoSans-Bold.ttf"
+      "./assets/fonts/"
     ],
     "experiments": {
       "typedRoutes": true,
