@@ -23,7 +23,18 @@ const initialCardsData: Folder[] = [
         ],
         cards: []
       },
-      { name: "犬1200(黄)", folders: [], cards: [] },
+      { name: "犬1200(黄)", folders: [], cards: [
+        { front: "achieve", back: "を達成する", memo: "" },
+        { front: "improve", back: "を向上させる", memo: "" },
+        { front: "environment", back: "環境", memo: "" },
+        { front: "challenge", back: "に挑戦する", memo: "" },
+        { front: "common", back: "共通の、一般的な", memo: "" },
+        { front: "develop", back: "を開発する、発達する", memo: "" },
+        { front: "necessary", back: "必要な", memo: "" },
+        { front: "provide", back: "を提供する", memo: "" },
+        { front: "respect", back: "を尊敬する", memo: "" },
+        { front: "value", back: "価値", memo: "" },
+      ] },
     ],
     cards: [
       { front: "Bráðum", back: "もうすぐ", memo: "アイスランド語単語 1900" },

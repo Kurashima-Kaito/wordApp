@@ -56,6 +56,21 @@ export default function RootLayout() {
               presentation: 'card',
             }} 
           />
+
+          <Stack.Screen 
+            name="selectFolder" 
+            options={{
+              animation: 'slide_from_bottom',
+              presentation: 'modal',
+            }} 
+          />
+
+          <Stack.Screen 
+            name="test" 
+            options={{
+              animation: 'slide_from_right',
+            }} 
+          />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

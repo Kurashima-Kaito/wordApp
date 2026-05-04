@@ -1,7 +1,7 @@
 //import { LinearGradient } from 'expo-linear-gradient';  //グラデーション
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   Pressable,
   SectionList,
@@ -9,6 +9,12 @@ import {
   Text,
   View
 } from 'react-native';
+import Animated, {
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  SlideOutRight
+} from 'react-native-reanimated';
 import {
   Card,
   createFolderList,
@@ -28,16 +34,19 @@ import { franc } from 'franc';
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
-  const { theme } = useTheme();
 
   //今の階層より上のフォルダ名を保存する
   const [currentFolder, setCurrentFolder] = useState<string[]>([]);
+  // 実際に表示・アニメーションに使用するフォルダ階層
+  const [activeFolder, setActiveFolder] = useState<string[]>([]);
   //今の階層とその下のフォルダ・ファイル
   const [foldersData, setFoldersData] = useState<Folder[]>(() =>
     JSON.parse(JSON.stringify(getCardsData()))
   );
   //読み上げ中かどうか
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
+  // 遷移の向き
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
 
   useFocusEffect(
     useCallback(() => {
@@ -45,28 +54,34 @@ export default function HomeScreen() {
     }, [])
   );
 
-  const currentFoldersData = findCurrentFoldersData(currentFolder, foldersData);
+  // currentFolderが変更されたら、次のレンダーでactiveFolderを更新する
+  // これにより、アンマウントされるコンポーネントが新しいdirectionを確実に受け取った状態でアニメーションを開始できる
+  useEffect(() => {
+    setActiveFolder(currentFolder);
+  }, [currentFolder]);
+
+  const currentFoldersData = findCurrentFoldersData(activeFolder, foldersData);
   const folderList = createFolderList(currentFoldersData);
 
-  const cardList = findCurrentCardsData(currentFolder, foldersData);
+  const cardList = findCurrentCardsData(activeFolder, foldersData);
   console.log(currentFoldersData, cardList)
 
   //フォルダをクリックしたときの処理
   const handleFolderPress = (name: string) => {
-    //フォルダ更新
+    setDirection('forward');
     setCurrentFolder(prev => [...prev, name]);
   };
   
   //カードをクリックしたときの処理
   const handleCardPress = (cardIndex: number) => {
     router.push(
-      `/edit?folderPath=${encodeURIComponent(JSON.stringify(currentFolder))}&cardIndex=${cardIndex}`
+      `/edit?folderPath=${encodeURIComponent(JSON.stringify(activeFolder))}&cardIndex=${cardIndex}`
     );
   };
   
   //フォルダ戻るボタン
   const handleUndoPress = () => {
-    //フォルダ階層を一つ浅くする
+    setDirection('backward');
     setCurrentFolder(prev => prev.slice(0, -1));
   };
 
@@ -153,7 +168,7 @@ export default function HomeScreen() {
             <Text style={cardStyles.cardSubTitleTextStyle}>{card.back}</Text>
           </View>
         </Pressable>
-        {card.memo != "" && (
+        {card.memo !== "" && (
           <View style={cardStyles.cardMemoContainer}>
             <Text style={cardStyles.cardMemoTextStyle}>
               {card.memo}
@@ -317,6 +332,18 @@ export default function HomeScreen() {
       borderRadius: 30,
       backgroundColor: colors.lessAccentColor,
     },
+    fab: {
+      ...shadow,
+      position: "absolute",
+      right: 20,
+      bottom: 20,
+      width: 65,
+      height: 65,
+      borderRadius: 32.5,
+      backgroundColor: colors.accentColor,
+      justifyContent: "center",
+      alignItems: "center",
+    },
   });
 
   //テキスト、その他のスタイル
@@ -340,6 +367,10 @@ export default function HomeScreen() {
       fontSize: 32,
       color: "white",
       textAlign: "center",
+    },
+    fabIcon: {
+      fontSize: 40,
+      color: "white",
     }
   });
 
@@ -355,30 +386,46 @@ export default function HomeScreen() {
         </Pressable>
       </View>
       
-      <SectionList
-        style={folderStyles.foldersContainer}
-        keyExtractor={(item, index) =>
-          typeof item === 'string' ? item : `${item.front}-${index}`
-        }
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        sections={[
-          {
-            title: 'フォルダ',
-            data: folderList,
-          },
-          {
-            title: 'カード',
-            data: cardList,
-          },
-        ]}
-      />
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Animated.View
+          key={activeFolder.join('/')}
+          entering={(direction === 'forward' ? SlideInRight : SlideInLeft).duration(300)}
+          exiting={(direction === 'forward' ? SlideOutLeft : SlideOutRight).duration(300)}
+          style={{ flex: 1 }}
+        >
+          <SectionList
+            style={folderStyles.foldersContainer}
+            keyExtractor={(item, index) =>
+              typeof item === 'string' ? item : `${item.front}-${index}`
+            }
+            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
+            sections={[
+              {
+                title: 'フォルダ',
+                data: folderList,
+              },
+              {
+                title: 'カード',
+                data: cardList,
+              },
+            ]}
+          />
+        </Animated.View>
+      </View>
       
       <Pressable
         onPress={() => handleUndoPress()}
         style={buttonStyles.undoButton}
       >
         <Text style={styles.largeTextStyle}>＜</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={() => router.push('/selectFolder')}
+        style={buttonStyles.fab}
+      >
+        <Ionicons name="play" size={32} color="white" />
       </Pressable>
     </>
   );
