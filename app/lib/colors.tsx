@@ -1,5 +1,5 @@
 import { useTheme } from './themeContext';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 
 //ライトテーマの色
 const lightColors = {
@@ -7,11 +7,12 @@ const lightColors = {
   element: "#fff",
   elementHover: "#f9f9f9",
   elementClicked: "#f0f0f0",
+  divider: "#c4c4c4",
 
   memo: "#e4d7b8",
 
   accentColor: "#84e053",
-  lessAccentColor: "#78bd53",
+  lessAccentColor: "#75c649",
 
   titleText: "#000",
   plainText: "#666",
@@ -23,10 +24,11 @@ const darkColors = {
   element: "#393939",
   elementHover: "#404040",
   elementClicked: "#494949",
+  divider: "#464646",
 
   memo: "#756c58",
 
-  accentColor: "#ffa221",
+  accentColor: "#84e053",
   lessAccentColor: "#6db83f",
 
   titleText: "#f0f0f0",
@@ -37,6 +39,17 @@ const darkColors = {
 export const useColors = () => {
   const { theme } = useTheme();
   return theme === 'dark' ? darkColors : lightColors;
+};
+  
+//iphoneの上部UIを隠すためのバー
+export const TabBar = () => {
+  const colors = useColors();
+  return (
+    <>
+      <View style={{height: 46, backgroundColor: colors.element}}/>
+      <View style={{height: 2, backgroundColor: colors.divider}}/>
+    </>
+  )
 };
 
 //共通の影スタイル

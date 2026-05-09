@@ -6,12 +6,17 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { ThemeProvider as CustomThemeProvider } from './lib/themeContext';
+import { loadCardsData } from './lib/cardsStore';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
+
+  useEffect(() => {
+    loadCardsData();
+  }, []);
 
   const [fontsLoaded] = useFonts({
     'BIZUDPGothic-Regular': require('../assets/fonts/BIZUDPGothic-Regular.ttf'),

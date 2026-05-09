@@ -12,7 +12,7 @@ import {
   getCardsData,
   Card
 } from './lib/cardsStore';
-import { boldWeight, shadow, useColors } from './lib/colors';
+import { boldWeight, shadow, useColors, TabBar } from './lib/colors';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -141,16 +141,21 @@ export default function TestScreen() {
 
   if (cards.length === 0) {
     return (
+      <>
+      <TabBar/>
       <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
         <Text style={{ color: colors.titleText, fontSize: 18 }}>カードがありません</Text>
         <Pressable onPress={() => router.back()} style={{ marginTop: 20 }}>
           <Text style={{ color: colors.accentColor }}>戻る</Text>
         </Pressable>
       </View>
+      </>
     );
   }
 
   return (
+    <>
+    <TabBar/>
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()}>
@@ -197,5 +202,6 @@ export default function TestScreen() {
         </Pressable>
       </View>
     </View>
+    </>
   );
 }

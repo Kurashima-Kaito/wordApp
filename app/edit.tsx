@@ -1,8 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
 import { getCard, updateCard } from './lib/cardsStore';
-import { boldWeight, shadow, useColors } from './lib/colors';
+import { boldWeight, shadow, TabBar, useColors } from './lib/colors';
 
 type CardData = {
   front: string;
@@ -127,11 +127,9 @@ export default function EditCardScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={{height: 48, backgroundColor: "black"}}>
-        <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
-      </View>
+      <TabBar/>
 
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.field}>
           <Text style={styles.label}>表面</Text>
           <TextInput
@@ -181,7 +179,7 @@ export default function EditCardScreen() {
             <Text style={styles.buttonText}>保存</Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 }

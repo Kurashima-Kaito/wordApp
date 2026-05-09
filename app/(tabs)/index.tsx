@@ -22,8 +22,9 @@ import {
   findCurrentFoldersData,
   Folder,
   getCardsData,
+  loadCardsData,
 } from '../lib/cardsStore';
-import { boldWeight, shadow, useColors } from '../lib/colors';
+import { boldWeight, shadow, useColors, TabBar } from '../lib/colors';
 import { useTheme } from '../lib/themeContext';
 
 //読み上げ
@@ -50,7 +51,9 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      setFoldersData(JSON.parse(JSON.stringify(getCardsData())));
+      loadCardsData().then(() => {
+        setFoldersData(JSON.parse(JSON.stringify(getCardsData())));
+      });
     }, [])
   );
 
@@ -154,18 +157,25 @@ export default function HomeScreen() {
             cardStyles.cardContainer,
             hovered && cardStyles.cardHover,
             pressed && cardStyles.cardPressed,
+            { flexDirection: 'row' }
           ]}
         >
-          <View style={cardStyles.cardTitleContainer}>
+          <View style={{ paddingLeft: 6, paddingTop: 5, justifyContent: 'flex-start', alignItems: "center" }}>
             <Ionicons name="volume-high" size={20} color="grey" onPress={() => handleSpeech(card.front)} />
-            <View style={{width: 5}}/>
-            <Text style={cardStyles.cardTitleTextStyle}>
-              {card.front}
-            </Text>
-            <Text style={cardStyles.cardIndexTextStyle}>{cardIndex}</Text>
           </View>
-          <View style={cardStyles.cardSubTitleContainer}>
-            <Text style={cardStyles.cardSubTitleTextStyle}>{card.back}</Text>
+
+          <View style={{ width: 1, backgroundColor: colors.divider, margin: 5, alignSelf: 'stretch'}} />
+
+          <View style={{ flex: 1 }}>
+            <View style={[cardStyles.cardTitleContainer, { paddingLeft: 0 }]}>
+              <Text style={cardStyles.cardTitleTextStyle}>
+                {card.front}
+              </Text>
+              <Text style={cardStyles.cardIndexTextStyle}>{cardIndex}</Text>
+            </View>
+            <View style={[cardStyles.cardSubTitleContainer, { paddingLeft: 0 }]}>
+              <Text style={cardStyles.cardSubTitleTextStyle}>{card.back}</Text>
+            </View>
           </View>
         </Pressable>
         {card.memo !== "" && (
@@ -188,11 +198,12 @@ export default function HomeScreen() {
       : <CardItem card={item as Card} cardIndex={index} />;
   };
 
+  //セクションヘッダー描画。フォルダとカードの間に線を引く
   const renderSectionHeader = ({ section }: { section: { title: string } }) => {
     return section.title === 'カード' ? <View style={styles.dividerStyle}/> : <></>;
   };
 
-  //フォルダ関連のスタイル
+ //フォルダ関連のスタイル
   const folderStyles = StyleSheet.create({
     foldersContainer: {
       paddingTop: 10,
@@ -205,10 +216,10 @@ export default function HomeScreen() {
       alignSelf: "stretch",
       
       borderRadius: 5,
-      height: 80,
+      paddingBottom: 10,
       backgroundColor: colors.element,
-      borderLeftWidth: 6,
-      borderLeftColor: colors.accentColor,
+      borderTopWidth: 6,
+      borderTopColor: colors.accentColor,
 
       ...shadow,
     },
@@ -219,14 +230,13 @@ export default function HomeScreen() {
       backgroundColor: colors.elementClicked,
     },
     folderTitleContainer: {
-      marginTop: 10,
-      height: 35,
       justifyContent: "center",
+      padding: 5,
       paddingLeft: 10,
       paddingRight: 20,
+
     },
     folderSubTitleContainer: {
-      height: 30,
       justifyContent: "center",
       paddingHorizontal: 10,
     },
@@ -262,10 +272,10 @@ export default function HomeScreen() {
       alignSelf: "stretch",
       
       borderRadius: 5,
-      minHeight: 80,
+      minHeight: 50,
       backgroundColor: colors.element,
-      borderTopWidth: 6,
-      borderTopColor: colors.accentColor,
+      borderLeftWidth: 6,
+      borderLeftColor: colors.accentColor,
       zIndex: 2,
     },
     cardMemoContainer: {
@@ -298,6 +308,7 @@ export default function HomeScreen() {
     cardSubTitleContainer: {
       justifyContent: "center",
       paddingHorizontal: 10,
+      marginBottom: 5,
     },
     cardTitleTextStyle: {
       fontWeight: boldWeight,
@@ -352,7 +363,7 @@ export default function HomeScreen() {
     dividerStyle: {
       borderBottomWidth: 2,
       marginHorizontal: 5,
-      borderColor: colors.element,
+      borderColor: colors.divider,
       marginBottom: 10,
     },
 
@@ -381,9 +392,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <View style={{height: 48, backgroundColor: "black"}}>
-        <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
-      </View>
+      <TabBar/>
 
       <View style={{height: 48, backgroundColor: colors.element, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 50, ...shadow, zIndex: 10}}>
         <Text 
