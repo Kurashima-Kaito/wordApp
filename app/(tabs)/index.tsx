@@ -326,7 +326,8 @@ export default function HomeScreen() {
       position: "absolute",
       left: 10,
       bottom: 20,
-      textAlignVertical: "center" as const,
+      alignItems: "center",
+      justifyContent: "center",
       width: 60,
       height: 60,
       borderRadius: 30,
@@ -371,6 +372,10 @@ export default function HomeScreen() {
     fabIcon: {
       fontSize: 40,
       color: "white",
+    },
+    folderPassTextStyle: {
+      fontSize: 15,
+      color: colors.plainText,
     }
   });
 
@@ -380,9 +385,21 @@ export default function HomeScreen() {
         <Text style={styles.largeTextStyle}>アイフォン15ではここが使えない</Text>
       </View>
 
-      <View style={{height: 48, backgroundColor: colors.element, alignItems: "center", justifyContent: "center", ...shadow}}>
-        <Pressable onPress={() => router.push('/settings')}>
-          <View style={{width: 30, height: 30, backgroundColor: colors.accentColor}}></View>
+      <View style={{height: 48, backgroundColor: colors.element, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 50, ...shadow, zIndex: 10}}>
+        <Text 
+          style={styles.folderPassTextStyle}
+          numberOfLines={1}
+          ellipsizeMode="middle"
+        >
+          {activeFolder.length === 0 ? "ホーム" : ["ホーム", ...activeFolder].join(' > ')}
+        </Text>
+        <Pressable 
+          onPress={() => router.push('/settings')}
+          style={{position: "absolute", right: 10}}
+        >
+          <View style={{width: 30, height: 30}}>
+            <Ionicons name="menu" size={30} color={colors.plainText} />
+          </View>
         </Pressable>
       </View>
       
@@ -418,7 +435,7 @@ export default function HomeScreen() {
         onPress={() => handleUndoPress()}
         style={buttonStyles.undoButton}
       >
-        <Text style={styles.largeTextStyle}>＜</Text>
+        <Ionicons name="arrow-back" size={40} color="white" />
       </Pressable>
 
       <Pressable

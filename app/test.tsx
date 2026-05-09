@@ -37,17 +37,6 @@ export default function TestScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showBack, setShowBack] = useState(false);
 
-  if (cards.length === 0) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: colors.titleText, fontSize: 18 }}>カードがありません</Text>
-        <Pressable onPress={() => router.back()} style={{ marginTop: 20 }}>
-          <Text style={{ color: colors.accentColor }}>戻る</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
   const currentCard = cards[currentIndex];
 
   const handleFlip = () => {
@@ -149,6 +138,17 @@ export default function TestScreen() {
         fontSize: 16,
     }
   });
+
+  if (cards.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: colors.titleText, fontSize: 18 }}>カードがありません</Text>
+        <Pressable onPress={() => router.back()} style={{ marginTop: 20 }}>
+          <Text style={{ color: colors.accentColor }}>戻る</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

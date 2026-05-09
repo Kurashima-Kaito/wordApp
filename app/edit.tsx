@@ -19,6 +19,9 @@ export default function EditCardScreen() {
   const [isValidCard, setIsValidCard] = useState(true);
   const colors = useColors();
 
+  // どのフィールドがフォーカスされているかを管理
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+
   useEffect(() => {
     const folderPath = params.folderPath ? JSON.parse(params.folderPath as string) as string[] : [];
     const cardIndex = params.cardIndex ? parseInt(params.cardIndex as string, 10) : -1;
@@ -56,7 +59,9 @@ export default function EditCardScreen() {
       fontWeight: boldWeight
     },
     input: {
-      backgroundColor: 'white',
+      backgroundColor: colors.element,
+      color: colors.titleText,
+      fontWeight: boldWeight,
       borderColor: colors.plainText,
       borderRadius: 5,
       padding: 3,
@@ -127,43 +132,56 @@ export default function EditCardScreen() {
       </View>
 
       <View style={styles.container}>
-      <View style={styles.field}>
-        <Text style={styles.label}>表面</Text>
-        <TextInput
-          style={styles.input}
-          value={front}
-          multiline
-          onChangeText={setFront}
-          placeholder="英単語"
-        />
+        <View style={styles.field}>
+          <Text style={styles.label}>表面</Text>
+          <TextInput
+            style={styles.input}
+            value={front}
+            multiline
+            autoFocus={true}
+            onFocus={() => setFocusedField('front')}
+            onBlur={() => setFocusedField(null)}
+            selectionColor={colors.accentColor}
+            onChangeText={setFront}
+            placeholder="英単語"
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>裏面</Text>
+          <TextInput
+            style={styles.input}
+            value={back}
+            multiline
+            onFocus={() => setFocusedField('back')}
+            onBlur={() => setFocusedField(null)}
+            selectionColor={colors.accentColor}
+            onChangeText={setBack}
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>メモ</Text>
+          <TextInput
+            style={[
+              styles.input,
+              styles.memoInput
+            ]}
+            value={memo}
+            onFocus={() => setFocusedField('memo')}
+            onBlur={() => setFocusedField(null)}
+            selectionColor={colors.accentColor}
+            onChangeText={setMemo}
+            multiline
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
+            <Text style={styles.buttonText}>キャンセル</Text>
+          </Pressable>
+          <Pressable style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>保存</Text>
+          </Pressable>
+        </View>
       </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>裏面</Text>
-        <TextInput
-          style={styles.input}
-          value={back}
-          multiline
-          onChangeText={setBack}
-        />
-      </View>
-      <View style={styles.field}>
-        <Text style={styles.label}>メモ</Text>
-        <TextInput
-          style={styles.input}
-          value={memo}
-          onChangeText={setMemo}
-          multiline
-        />
-      </View>
-      <View style={styles.buttonRow}>
-        <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
-          <Text style={styles.buttonText}>キャンセル</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>保存</Text>
-        </Pressable>
-      </View>
-    </View>
     </>
   );
 }
