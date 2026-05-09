@@ -8,7 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const showTabBar = true; // T/Fで表示/非表示を切り替え
+  const showTabBar = false; // T/Fで表示/非表示を切り替え
 
   return (
     <Tabs

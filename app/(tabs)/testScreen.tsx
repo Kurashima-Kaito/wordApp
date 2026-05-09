@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { Platform, Text, View, StyleSheet, TextInput, Button } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { TabBar } from '../lib/colors';
 
 export default function testScreen() {
   const [word, setWord] = useState('');
@@ -38,6 +39,8 @@ const html = `
 `;
 
   return (
+    <>
+    <TabBar/>
     <View style={styles.container}>
       <TextInput
         style={styles.input}
@@ -58,6 +61,7 @@ const html = `
         )
       )}
     </View>
+    </>
   );
 }
 

@@ -75,14 +75,7 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.settingContainer}>
-          <Text style={styles.label}>日本語フォント</Text>
-          <View style={styles.pickerContainer}>
-            
-          </View>
-        </View>
-        
-        <View style={styles.settingContainer}>
-          <Text style={styles.label}>英数字フォント</Text>
+          <Text style={styles.label}>言語</Text>
           <View style={styles.pickerContainer}>
             
           </View>

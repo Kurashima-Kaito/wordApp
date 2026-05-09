@@ -20,6 +20,7 @@ import {
   getCardsData,
 } from './lib/cardsStore';
 import { boldWeight, shadow, useColors } from './lib/colors';
+import { TabBar } from './lib/colors';
 
 export default function SelectFolderScreen() {
   const router = useRouter();
@@ -151,6 +152,8 @@ export default function SelectFolderScreen() {
   });
 
   return (
+    <>
+    <TabBar/>
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={handleUndoPress}>
@@ -185,5 +188,6 @@ export default function SelectFolderScreen() {
         <Text style={styles.confirmButtonText}>このフォルダでテスト開始</Text>
       </Pressable>
     </View>
+    </>
   );
 }
