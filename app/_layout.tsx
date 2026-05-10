@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { ThemeProvider as CustomThemeProvider } from './lib/themeContext';
+import { LanguageProvider } from './lib/languageContext';
 import { loadCardsData } from './lib/cardsStore';
 
 export const unstable_settings = {
@@ -30,8 +31,9 @@ export default function RootLayout() {
   });
   
   return (
-    <CustomThemeProvider>
-      <ThemeProvider value={DefaultTheme}>
+    <LanguageProvider>
+      <CustomThemeProvider>
+        <ThemeProvider value={DefaultTheme}>
         <Stack
           // すべての画面に共通のデフォルトを設定したい場合は、ここで指定
           screenOptions={{
@@ -80,5 +82,6 @@ export default function RootLayout() {
         <StatusBar style="auto" />
       </ThemeProvider>
     </CustomThemeProvider>
+  </LanguageProvider>
   );
 }

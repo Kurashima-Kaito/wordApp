@@ -26,6 +26,7 @@ import {
 } from '../lib/cardsStore';
 import { boldWeight, shadow, useColors, TabBar } from '../lib/colors';
 import { useTheme } from '../lib/themeContext';
+import { useLanguage, Language } from '../lib/languageContext';
 
 //読み上げ
 import { Ionicons } from '@expo/vector-icons';
@@ -48,6 +49,7 @@ export default function HomeScreen() {
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
   // 遷移の向き
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  const { language, setLanguage, t } = useLanguage(); //ローカライズされたテキスト
 
   useFocusEffect(
     useCallback(() => {
@@ -400,7 +402,7 @@ export default function HomeScreen() {
           numberOfLines={1}
           ellipsizeMode="middle"
         >
-          {activeFolder.length === 0 ? "ホーム" : ["ホーム", ...activeFolder].join(' > ')}
+          {activeFolder.length === 0 ? t('home') : [t('home'), ...activeFolder].join(' > ')}
         </Text>
         <Pressable 
           onPress={() => router.push('/settings')}
