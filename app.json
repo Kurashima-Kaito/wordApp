@@ -40,12 +40,21 @@
         }
       ]
     ],
-    "assets": [
-      "./assets/fonts/"
-    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "43b8c45a-f782-4881-ae03-abc176b9fe28"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/43b8c45a-f782-4881-ae03-abc176b9fe28"
     }
   }
 }

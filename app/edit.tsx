@@ -1,14 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
-import { getCard, updateCard } from './lib/cardsStore';
+import { getCard, updateCard, Card } from './lib/cardsStore';
 import { boldWeight, shadow, TabBar, useColors } from './lib/colors';
-
-type CardData = {
-  front: string;
-  back: string;
-  memo: string;
-};
 
 export default function EditCardScreen() {
   const router = useRouter();
@@ -16,6 +10,7 @@ export default function EditCardScreen() {
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
   const [memo, setMemo] = useState('');
+  const [memorizationLevel, setMemorizationLevel] = useState(0);
   const [isValidCard, setIsValidCard] = useState(true);
   const colors = useColors();
 
@@ -35,6 +30,7 @@ export default function EditCardScreen() {
     setFront(card.front);
     setBack(card.back);
     setMemo(card.memo);
+    setMemorizationLevel(card.memorizationLevel);
     setIsValidCard(true);
   }, [params.folderPath, params.cardIndex]);
 
@@ -43,7 +39,15 @@ export default function EditCardScreen() {
     const cardIndex = params.cardIndex ? parseInt(params.cardIndex as string, 10) : -1;
     if (cardIndex < 0) return;
 
-    updateCard(folderPath, cardIndex, { front, back, memo });
+    const updatedCard: Card = {
+      front,
+      back,
+      memo,
+      lastEdited: new Date().toISOString(),
+      memorizationLevel,
+    };
+
+    updateCard(folderPath, cardIndex, updatedCard);
     router.back();
   };
 

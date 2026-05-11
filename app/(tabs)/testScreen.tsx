@@ -1,16 +1,27 @@
-﻿import { useState } from 'react';
-import { Platform, Text, View, StyleSheet, TextInput, Button, Pressable } from 'react-native';
+﻿import { useState, useMemo } from 'react';
+import { Platform, Text, View, StyleSheet, TextInput, Button, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { WebView } from 'react-native-webview';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { TabBar, useColors, shadow } from '../lib/colors';
+import { resetCardsData } from '../lib/cardsStore';
+
+const generateData = (length: number = 10) =>
+  Array.from({ length }, (_, index) => ({
+    month: index + 1,
+    listenCount: Math.floor(Math.random() * (100 - 50 + 1)) + 50,
+    favouriteCount: Math.floor(Math.random() * (100 - 50 + 1)) + 20,
+    sales: Math.floor(Math.random() * (100 - 50 + 1)) + 25,
+  }));
 
 export default function testScreen() {
   const router = useRouter();
   const [word, setWord] = useState('');
   const [url, setUrl] = useState('');
   const colors = useColors();
+
+  // データを固定（レンダリング毎に生成されないようにする）
+  const chartData = useMemo(() => generateData(), []);
 
   const handleSearch = () => {
     if (!word) return;
@@ -20,26 +31,31 @@ export default function testScreen() {
     setUrl(embedUrl);
   };
 
-  const LiquidGlassButton = ({ title, onPress }: { title: string; onPress?: () => void }) => {
-    if (Platform.OS !== 'ios') {
-      return <Button title={title} onPress={onPress} />;
-    }
+  const handleReset = async () => {
+    const confirmReset = () => {
+      resetCardsData().then(() => {
+        if (Platform.OS === 'web') {
+          window.alert('データをリセットしました。');
+        } else {
+          Alert.alert('リセット', 'データをリセットしました。');
+        }
+      });
+    };
 
-    return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.liquidButtonContainer,
-          pressed && { transform: [{ scale: 0.98 }] },
-        ]}
-      >
-        <BlurView intensity={80} tint="light" style={styles.blurContainer}>
-          <View style={styles.buttonContent}>
-            <Text style={styles.liquidButtonText}>{title}</Text>
-          </View>
-        </BlurView>
-      </Pressable>
-    );
+    if (Platform.OS === 'web') {
+      if (window.confirm('データを初期状態にリセットしますか？')) {
+        confirmReset();
+      }
+    } else {
+      Alert.alert(
+        'データのリセット',
+        'すべてのカードとフォルダを初期状態に戻しますか？',
+        [
+          { text: 'キャンセル', style: 'cancel' },
+          { text: 'リセット', style: 'destructive', onPress: confirmReset },
+        ]
+      );
+    }
   };
 
 const html = `
@@ -82,21 +98,24 @@ const html = `
         value={word}
         onChangeText={setWord}
       />
-      <Button title="検索" onPress={handleSearch} />
+      <View style={{ marginHorizontal: 10 }}>
+        <Button title="検索" onPress={handleSearch} />
+      </View>
+
+      <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
+        <Button title="データをリセット (デバッグ用)" color="#ff4444" onPress={handleReset} />
+      </View>
 
       {url !== '' && (
         Platform.OS === 'web' ? (
           <iframe
             srcDoc={html}
-            style={{ width: '100%', height: '500px', border: 'none' }}
+            style={{ width: '100%', height: '500px', border: 'none', marginTop: 20 }}
           />
         ) : (
-          <WebView originWhitelist={['*']} source={{ html }} />
+          <WebView originWhitelist={['*']} source={{ html }} style={styles.webview} />
         )
       )}
-    </View>
-    <View style={styles.buttonWrapper}>
-      <LiquidGlassButton title="ボタン"/>
     </View>
     </>
   );

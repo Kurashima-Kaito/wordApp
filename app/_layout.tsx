@@ -18,17 +18,6 @@ export default function RootLayout() {
   useEffect(() => {
     loadCardsData();
   }, []);
-
-  const [fontsLoaded] = useFonts({
-    'BIZUDPGothic-Regular': require('../assets/fonts/BIZUDPGothic-Regular.ttf'),
-    'BIZUDPGothic-Bold': require('../assets/fonts/BIZUDPGothic-Bold.ttf'),
-    'BIZUDPMincho-Regular': require('../assets/fonts/BIZUDPMincho-Regular.ttf'),
-    'BIZUDPMincho-Bold': require('../assets/fonts/BIZUDPMincho-Bold.ttf'),
-    'GentiumBookPlus-Regular': require('../assets/fonts/GentiumBookPlus-Regular.ttf'),
-    'GentiumBookPlus-Bold': require('../assets/fonts/GentiumBookPlus-Bold.ttf'),
-    'NotoSans-Regular': require('../assets/fonts/NotoSans-Regular.ttf'),
-    'NotoSans-Bold': require('../assets/fonts/NotoSans-Bold.ttf')
-  });
   
   return (
     <LanguageProvider>

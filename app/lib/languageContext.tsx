@@ -9,24 +9,28 @@ const translations = {
     darkMode: 'ダークモード',
     language: '言語',
     home: 'ホーム',
+    cards: 'カード',
   },
   en: {
     settings: 'Settings',
     darkMode: 'Dark Mode',
     language: 'Language',
     home: 'Home',
+    cards: 'Cards',
   },
   fr: {
     settings: 'Paramètres',
     darkMode: 'Mode sombre',
     language: 'Langue',
     home: 'Maison',
+    cards: 'Cartes',
   },
   fi: {
     settings: 'Asetukset',
     darkMode: 'Tumma tila',
     language: 'Kieli',
     home: 'Koti',
+    cards: 'Kortit',
   },
 };
 
