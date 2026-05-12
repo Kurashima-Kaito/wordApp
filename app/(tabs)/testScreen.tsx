@@ -5,6 +5,7 @@ import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { TabBar, useColors, shadow } from '../lib/colors';
 import { resetCardsData } from '../lib/cardsStore';
+import { useLanguage, Language } from '../lib/languageContext';
 
 const generateData = (length: number = 10) =>
   Array.from({ length }, (_, index) => ({

@@ -13,6 +13,9 @@ const lightColors = {
 
   accentColor: "#84e053",
   lessAccentColor: "#75c649",
+  remembered: "#5ce617",
+  ambiguous: "#dee617",
+  notRemembered: "#e63917",
 
   titleText: "#000",
   plainText: "#666",
@@ -30,6 +33,9 @@ const darkColors = {
 
   accentColor: "#84e053",
   lessAccentColor: "#6db83f",
+  remembered: "#51cc14",
+  ambiguous: "#cccc14",
+  notRemembered: "#cc3f14",
 
   titleText: "#f0f0f0",
   plainText: "#bbb",

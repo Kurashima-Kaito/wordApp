@@ -10,6 +10,10 @@ const translations = {
     language: '言語',
     home: 'ホーム',
     cards: 'カード',
+    cardRememberingRate: '全カードの暗記率',
+    remembered: '暗記済み',
+    ambiguous: 'あいまい',
+    notRemembered: '未暗記',
   },
   en: {
     settings: 'Settings',
@@ -17,6 +21,10 @@ const translations = {
     language: 'Language',
     home: 'Home',
     cards: 'Cards',
+    cardRememberingRate: 'Overall Memorization Rate',
+    remembered: 'Remembered',
+    ambiguous: 'Ambiguous',
+    notRemembered: 'Not Remembered',
   },
   fr: {
     settings: 'Paramètres',
@@ -24,6 +32,10 @@ const translations = {
     language: 'Langue',
     home: 'Maison',
     cards: 'Cartes',
+    cardRememberingRate: 'Taux de mémorisation global',
+    remembered: 'Rappelé',
+    ambiguous: 'Ambigu',
+    notRemembered: 'Non rappelé',
   },
   fi: {
     settings: 'Asetukset',
@@ -31,6 +43,10 @@ const translations = {
     language: 'Kieli',
     home: 'Koti',
     cards: 'Kortit',
+    cardRememberingRate: 'Yleinen muistamisaste',
+    remembered: 'Muistettu',
+    ambiguous: 'Epäselvä',
+    notRemembered: 'Ei muistettu',
   },
 };
 

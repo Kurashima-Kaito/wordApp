@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Switch, Text, View, Modal, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { boldWeight, shadow, useColors } from './lib/colors';
 import { useTheme } from './lib/themeContext';
 import { useLanguage, Language } from './lib/languageContext';
@@ -11,6 +11,16 @@ export default function SettingsScreen() {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage(); //ローカライズされたテキスト
   const colors = useColors();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const languages: { label: string; value: Language }[] = [
+    { label: '日本語', value: 'ja' },
+    { label: 'English', value: 'en' },
+    { label: 'Français', value: 'fr' },
+    { label: 'Suomi', value: 'fi' },
+  ];
+
+  const currentLanguageLabel = languages.find(l => l.value === language)?.label || '日本語';
 
   const styles = StyleSheet.create({
     title: {
@@ -23,12 +33,6 @@ export default function SettingsScreen() {
       fontSize: 18,
       color: colors.titleText,
     },
-    largeTextStyle: {
-      fontWeight: boldWeight,
-      fontSize: 32,
-      color: "white",
-      textAlign: "center",
-    },
     settingsContainer: {
       flex: 1,
       padding: 20,
@@ -38,85 +42,125 @@ export default function SettingsScreen() {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      
-      padding: 10,
+      padding: 15,
       marginBottom: 10,
-      borderRadius: 5,
+      borderRadius: 10,
       backgroundColor: colors.element,
-      overflow: "hidden",
-      zIndex: 2,
-
       ...shadow,
     },
-    pickerContainer: {
-      marginLeft: 10,
-      borderRadius: 5,
-      backgroundColor: 'transparent',
-      width: '50%',
-    },
-    picker: {
-      color: colors.titleText,
-      paddingVertical: 10,
-      paddingHorizontal: 10,
-    },
-  });
-
-  const pickerSelectStyles = StyleSheet.create({
-    inputIOS: {
-      fontSize: 16,
-      paddingVertical: 12,
-      paddingHorizontal: 10,
-      borderWidth: 1,
-      borderColor: 'gray',
-      borderRadius: 4,
-      color: colors.titleText,
-      paddingRight: 30, // to ensure the text is never behind the icon
-    },
-    inputAndroid: {
-      fontSize: 16,
-      paddingHorizontal: 10,
+    dropdownTrigger: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       paddingVertical: 8,
-      borderWidth: 0.5,
-      borderColor: 'purple',
-      borderRadius: 8,
+      paddingHorizontal: 12,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: colors.divider,
+      minWidth: 120,
+    },
+    dropdownText: {
+      fontSize: 16,
       color: colors.titleText,
-      paddingRight: 30, // to ensure the text is never behind the icon
+      marginRight: 8,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      width: '80%',
+      backgroundColor: colors.element,
+      borderRadius: 15,
+      padding: 10,
+      ...shadow,
+    },
+    modalItem: {
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.divider,
+    },
+    modalItemText: {
+      fontSize: 18,
+      color: colors.titleText,
+      textAlign: 'center',
+    },
+    lastModalItem: {
+      borderBottomWidth: 0,
     },
   });
 
   return (<>
-      <View style={{height: 48, backgroundColor: colors.element, alignItems: "center", justifyContent: "center"}}>
-        <Pressable onPress={() => router.push('/')}>
-          <Text style={styles.label}>{t('settings')}</Text>
+      <View style={{height: 48, backgroundColor: colors.element, alignItems: "center", justifyContent: "center", borderBottomWidth: 1, borderBottomColor: colors.divider}}>
+        <Pressable 
+          onPress={() => router.push('/')}
+          style={{ position: 'absolute', left: 15 }}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.titleText} />
         </Pressable>
+        <Text style={styles.label}>{t('settings')}</Text>
       </View>
       <View style={styles.settingsContainer}>
-        
+
         <View style={styles.settingContainer}>
           <Text style={[styles.label]}>{t('darkMode')}</Text>
           <Switch
             value={theme === 'dark'}
             onValueChange={toggleTheme}
+            trackColor={{ false: '#767577', true: colors.accentColor }}
+            thumbColor={theme === 'dark' ? '#f4f3f4' : '#f4f3f4'}
           />
         </View>
-        
+
         <View style={styles.settingContainer}>
           <Text style={styles.label}>{t('language')}</Text>
-          <View style={styles.pickerContainer}>
-            <RNPickerSelect
-              onValueChange={(value: Language) => setLanguage(value)}
-              items={[
-                { label: '日本語', value: 'ja' },
-                { label: 'English', value: 'en' },
-                { label: 'Français', value: 'fr' },
-                { label: 'Suomi', value: 'fi' },
-              ]}
-              value={language}
-              style={pickerSelectStyles}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <Pressable 
+            style={styles.dropdownTrigger}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.dropdownText}>{currentLanguageLabel}</Text>
+            <Ionicons name="chevron-down" size={18} color={colors.plainText} />
+          </Pressable>
         </View>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <Pressable 
+            style={styles.modalOverlay} 
+            onPress={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContent}>
+              {languages.map((item, index) => (
+                <Pressable
+                  key={item.value}
+                  style={[
+                    styles.modalItem,
+                    index === languages.length - 1 && styles.lastModalItem,
+                    language === item.value && { backgroundColor: colors.background + '80' }
+                  ]}
+                  onPress={() => {
+                    setLanguage(item.value);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.modalItemText,
+                    language === item.value && { fontWeight: 'bold', color: colors.accentColor }
+                  ]}>
+                    {item.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </Pressable>
+        </Modal>
 
       </View>
   </>);
